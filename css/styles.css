@@ -397,6 +397,197 @@ a {
   color: var(--text);
 }
 
+.hidden {
+  display: none !important;
+}
+
+.dice-scene,
+.jackpot-scene {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 180px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: radial-gradient(circle at center, rgba(255, 215, 118, 0.08), rgba(12, 18, 31, 0.96));
+}
+
+.dice-cube {
+  position: relative;
+  width: 110px;
+  height: 110px;
+  transform-style: preserve-3d;
+  transition: transform 0.2s ease;
+  filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.4));
+}
+
+.dice-face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #ffffff, #d7e3ff);
+  color: #111827;
+  font-size: 2.5rem;
+  font-weight: 800;
+  box-shadow: inset 0 0 0 2px rgba(17, 24, 39, 0.08);
+}
+
+.face-1 { transform: rotateY(0deg) translateZ(55px); }
+.face-2 { transform: rotateY(90deg) translateZ(55px); }
+.face-3 { transform: rotateX(90deg) translateZ(55px); }
+.face-4 { transform: rotateX(-90deg) translateZ(55px); }
+.face-5 { transform: rotateY(-90deg) translateZ(55px); }
+.face-6 { transform: rotateY(180deg) translateZ(55px); }
+
+.dice-rolling {
+  animation: dice-roll 0.65s linear infinite;
+}
+
+@keyframes dice-roll {
+  0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+  25% { transform: rotateX(180deg) rotateY(90deg) rotateZ(45deg); }
+  50% { transform: rotateX(360deg) rotateY(180deg) rotateZ(90deg); }
+  75% { transform: rotateX(540deg) rotateY(270deg) rotateZ(135deg); }
+  100% { transform: rotateX(720deg) rotateY(360deg) rotateZ(180deg); }
+}
+
+.jackpot-wheel-wrap {
+  position: relative;
+  width: 220px;
+  height: 220px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.jackpot-wheel {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 10px solid rgba(244, 201, 109, 0.7);
+  background: radial-gradient(circle, rgba(255, 244, 214, 0.2), rgba(17, 25, 42, 0.98));
+  box-shadow: inset 0 0 0 8px rgba(244, 201, 109, 0.15), 0 12px 24px rgba(0, 0, 0, 0.3);
+  transition: transform 2.7s cubic-bezier(0.08, 0.82, 0.18, 1);
+}
+
+.jackpot-slot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 54px;
+  height: 54px;
+  margin-left: -27px;
+  margin-top: -27px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(244, 201, 109, 0.33);
+  color: var(--gold-strong);
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.slot-1 { transform: rotate(0deg) translateY(-76px) rotate(0deg); }
+.slot-2 { transform: rotate(45deg) translateY(-76px) rotate(-45deg); }
+.slot-3 { transform: rotate(90deg) translateY(-76px) rotate(-90deg); }
+.slot-4 { transform: rotate(135deg) translateY(-76px) rotate(-135deg); }
+.slot-5 { transform: rotate(180deg) translateY(-76px) rotate(-180deg); }
+.slot-6 { transform: rotate(225deg) translateY(-76px) rotate(-225deg); }
+.slot-7 { transform: rotate(270deg) translateY(-76px) rotate(-270deg); }
+.slot-8 { transform: rotate(315deg) translateY(-76px) rotate(-315deg); }
+
+.jackpot-pointer {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 16px solid transparent;
+  border-right: 16px solid transparent;
+  border-top: 28px solid var(--gold);
+  filter: drop-shadow(0 4px 12px rgba(244, 201, 109, 0.7));
+  z-index: 2;
+}
+
+.slots-scene {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  background: radial-gradient(circle at center, rgba(87, 211, 156, 0.1), rgba(12, 18, 31, 0.96));
+  padding: 16px;
+}
+
+.slots-reels {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(90px, 1fr));
+  gap: 14px;
+  width: min(100%, 420px);
+}
+
+.slot-reel {
+  position: relative;
+  height: 154px;
+  overflow: hidden;
+  border-radius: 16px;
+  border: 1px solid rgba(244, 201, 109, 0.35);
+  background: rgba(12, 18, 31, 0.95);
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.04);
+}
+
+.slot-reel::before,
+.slot-reel::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 18px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.slot-reel::before {
+  top: 0;
+  background: linear-gradient(180deg, rgba(10, 15, 25, 1), rgba(10, 15, 25, 0));
+}
+
+.slot-reel::after {
+  bottom: 0;
+  background: linear-gradient(0deg, rgba(10, 15, 25, 1), rgba(10, 15, 25, 0));
+}
+
+.slot-track {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 0;
+  will-change: transform;
+  transition: transform 1.8s cubic-bezier(0.12, 0.8, 0.2, 1);
+}
+
+.slot-item {
+  width: 100%;
+  height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--gold-strong);
+  font-size: clamp(1.1rem, 2vw, 1.8rem);
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
 .win-text {
   color: var(--green);
 }

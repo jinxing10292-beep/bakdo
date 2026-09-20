@@ -90,6 +90,37 @@
               <div id="result-value" class="result-value">결과를 기다리는 중...</div>
               <button id="play-btn" class="primary-btn">게임 실행</button>
             </div>
+
+            <div id="dice-scene" class="dice-scene hidden" aria-live="polite">
+              <div class="dice-cube" id="dice-cube">
+                <span class="dice-face face-1">⚀</span>
+                <span class="dice-face face-2">⚁</span>
+                <span class="dice-face face-3">⚂</span>
+                <span class="dice-face face-4">⚃</span>
+                <span class="dice-face face-5">⚄</span>
+                <span class="dice-face face-6">⚅</span>
+              </div>
+            </div>
+
+            <div id="jackpot-scene" class="jackpot-scene hidden" aria-live="polite">
+              <div class="jackpot-wheel-wrap">
+                <div class="jackpot-pointer" aria-hidden="true"></div>
+                <div id="jackpot-wheel" class="jackpot-wheel">
+                  <span class="jackpot-slot slot-1">7</span>
+                  <span class="jackpot-slot slot-2">BAR</span>
+                  <span class="jackpot-slot slot-3">★</span>
+                  <span class="jackpot-slot slot-4">777</span>
+                  <span class="jackpot-slot slot-5">7</span>
+                  <span class="jackpot-slot slot-6">CHERRY</span>
+                  <span class="jackpot-slot slot-7">BAR</span>
+                  <span class="jackpot-slot slot-8">7</span>
+                </div>
+              </div>
+            </div>
+
+            <div id="slots-scene" class="slots-scene hidden" aria-live="polite">
+              <div id="slots-reels" class="slots-reels"></div>
+            </div>
           </section>
 
           <section class="history-panel">

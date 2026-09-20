@@ -1,3 +1,16 @@
+-- WARNING: DESTRUCTIVE RESET SCRIPT FOR LOCAL/DEV DATABASES ONLY.
+-- This removes absolutely everything in the public schema, including tables,
+-- policies, functions, sequences, views, and triggers, then recreates the schema.
+-- Use only when you intentionally want a full reset.
+
+drop schema if exists public cascade;
+create schema public;
+
+grant all on schema public to postgres;
+grant all on schema public to public;
+grant all on schema public to authenticated;
+grant all on schema public to anon;
+
 create extension if not exists pgcrypto with schema extensions;
 
 create table if not exists public.profiles (
@@ -251,19 +264,32 @@ begin
 end;
 $$;
 
-insert into public.game_config (game, params)
+insert into public.game_config (game, enabled, min_bet, max_bet, params)
 values
-  ('coinflip', '{"multiplier": 1.95}'),
-  ('dice', '{"multiplier": 5}'),
-  ('rps', '{"multiplier": 1.94}'),
-  ('roulette', '{"multiplier": 35}'),
-  ('slots', '{"multiplier": 10}'),
-  ('jackpot', '{"multiplier": 50}');
+  ('coinflip', true, 10, 100000, '{"multiplier": 1.95}'),
+  ('dice', true, 10, 100000, '{"multiplier": 5}'),
+  ('rps', true, 10, 100000, '{"multiplier": 1.94}'),
+  ('roulette', true, 10, 100000, '{"multiplier": 35}'),
+  ('slots', true, 10, 100000, '{"multiplier": 10}'),
+  ('jackpot', true, 10, 100000, '{"multiplier": 50}')
+on conflict (game)
+do update set
+  enabled = excluded.enabled,
+  min_bet = excluded.min_bet,
+  max_bet = excluded.max_bet,
+  params = excluded.params;
 
 insert into public.items (name, type, price, description)
-values
-  ('보호권', 'protect', 2000, '강화 실패 시 1회 보호'),
-  ('강화 주문서', 'boost', 1500, '강화 성공률 +5%p');
+select '보호권', 'protect', 2000, '강화 실패 시 1회 보호'
+where not exists (
+  select 1 from public.items where name = '보호권' and type = 'protect'
+);
+
+insert into public.items (name, type, price, description)
+select '강화 주문서', 'boost', 1500, '강화 성공률 +5%p'
+where not exists (
+  select 1 from public.items where name = '강화 주문서' and type = 'boost'
+);
 
 revoke all on function public.get_leaderboard(int) from public, anon;
 grant execute on function public.get_leaderboard(int) to authenticated;

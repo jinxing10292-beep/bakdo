@@ -90,6 +90,22 @@ const statsWinrateEl = document.getElementById('stats-winrate');
 const choiceButtonsEl = document.getElementById('choice-buttons');
 const navButtons = document.querySelectorAll('.nav-btn');
 const chipButtons = document.querySelectorAll('.chip-btn');
+const diceSceneEl = document.getElementById('dice-scene');
+const diceCubeEl = document.getElementById('dice-cube');
+const jackpotSceneEl = document.getElementById('jackpot-scene');
+const jackpotWheelEl = document.getElementById('jackpot-wheel');
+const slotsSceneEl = document.getElementById('slots-scene');
+const slotsReelsEl = document.getElementById('slots-reels');
+const slotSymbols = ['7', '🍒', '⭐', '💎', 'BAR', '777'];
+
+const diceFaceMap = {
+  1: 'rotateX(0deg) rotateY(0deg)',
+  2: 'rotateY(90deg) rotateZ(-90deg)',
+  3: 'rotateX(-90deg) rotateZ(0deg)',
+  4: 'rotateX(90deg) rotateZ(0deg)',
+  5: 'rotateY(-90deg) rotateZ(90deg)',
+  6: 'rotateX(180deg) rotateY(180deg)',
+};
 
 function loadState() {
   const saved = localStorage.getItem(STORAGE_KEY);
@@ -198,6 +214,34 @@ function syncSelectionForGame() {
   }
 }
 
+function setupSlotsScene() {
+  if (!slotsReelsEl) {
+    return;
+  }
+
+  slotsReelsEl.innerHTML = '';
+  const reelCount = 3;
+
+  for (let reelIndex = 0; reelIndex < reelCount; reelIndex += 1) {
+    const reel = document.createElement('div');
+    reel.className = 'slot-reel';
+
+    const track = document.createElement('div');
+    track.className = 'slot-track';
+
+    const repeatedSymbols = [...slotSymbols, ...slotSymbols, ...slotSymbols, ...slotSymbols];
+    repeatedSymbols.forEach((symbol) => {
+      const item = document.createElement('div');
+      item.className = 'slot-item';
+      item.textContent = symbol;
+      track.appendChild(item);
+    });
+
+    reel.appendChild(track);
+    slotsReelsEl.appendChild(reel);
+  }
+}
+
 function setActiveGame(gameKey) {
   if (!gameConfig[gameKey]) {
     return;
@@ -210,8 +254,101 @@ function setActiveGame(gameKey) {
     button.classList.toggle('active', button.dataset.game === gameKey);
   });
 
+  if (diceSceneEl) {
+    diceSceneEl.classList.toggle('hidden', gameKey !== 'dice');
+  }
+
+  if (jackpotSceneEl) {
+    jackpotSceneEl.classList.toggle('hidden', gameKey !== 'jackpot');
+  }
+
+  if (slotsSceneEl) {
+    slotsSceneEl.classList.toggle('hidden', gameKey !== 'slots');
+  }
+
   updateGameTitle();
   renderChoiceButtons();
+}
+
+function animateDiceRoll(finalValue, callback) {
+  if (!diceSceneEl || !diceCubeEl) {
+    callback();
+    return;
+  }
+
+  diceSceneEl.classList.remove('hidden');
+  diceCubeEl.classList.add('dice-rolling');
+
+  const cycle = [1, 2, 3, 4, 5, 6, 2, 5, 3, 1, 6, 4];
+  let index = 0;
+
+  const timer = setInterval(() => {
+    const value = cycle[index % cycle.length];
+    diceCubeEl.style.transform = diceFaceMap[value] || diceFaceMap[1];
+    index += 1;
+  }, 90);
+
+  setTimeout(() => {
+    clearInterval(timer);
+    diceCubeEl.classList.remove('dice-rolling');
+    diceCubeEl.style.transform = diceFaceMap[finalValue] || diceFaceMap[1];
+    setTimeout(() => callback(), 180);
+  }, 900);
+}
+
+function animateJackpotSpin(finalIndex, callback) {
+  if (!jackpotSceneEl || !jackpotWheelEl) {
+    callback();
+    return;
+  }
+
+  jackpotSceneEl.classList.remove('hidden');
+  const totalTurns = 6;
+  const baseRotation = 360 * totalTurns;
+  const singleStep = 360 / 8;
+  const offset = 360 - (finalIndex * singleStep + singleStep / 2);
+  const finalRotation = baseRotation + offset;
+
+  jackpotWheelEl.style.transform = `rotate(${finalRotation}deg)`;
+
+  setTimeout(() => callback(), 2800);
+}
+
+function animateSlotsSpin(finalSymbols, callback) {
+  if (!slotsSceneEl || !slotsReelsEl) {
+    callback();
+    return;
+  }
+
+  slotsSceneEl.classList.remove('hidden');
+  const reels = Array.from(slotsReelsEl.querySelectorAll('.slot-reel'));
+
+  reels.forEach((reel, index) => {
+    const track = reel.querySelector('.slot-track');
+    const items = Array.from(track.children);
+    if (!items.length) return;
+
+    const itemHeight = items[0].offsetHeight + 10;
+    const randomOffset = Math.floor(Math.random() * 16 + 8) * itemHeight;
+    const targetSymbol = finalSymbols[index];
+    let targetOffset = 0;
+
+    for (let i = 0; i < items.length; i += 1) {
+      if (items[i].textContent === targetSymbol) {
+        targetOffset = i * itemHeight;
+      }
+    }
+
+    track.style.transition = 'none';
+    track.style.transform = `translateY(-${randomOffset}px)`;
+
+    setTimeout(() => {
+      track.style.transition = 'transform 1.7s cubic-bezier(0.12, 0.8, 0.2, 1)';
+      track.style.transform = `translateY(-${targetOffset}px)`;
+    }, 80 + index * 110);
+  });
+
+  setTimeout(callback, 1900);
 }
 
 function addHistory({ game, summary, result, outcome }) {
@@ -275,7 +412,6 @@ function resolveCoinFlip() {
 function resolveDice() {
   const bet = Number(betInputEl.value) || 0;
   const guess = Number(state.selectedChoice);
-  const roll = Math.floor(Math.random() * 6) + 1;
 
   if (bet < 10 || bet > 500000) {
     setResult('배팅 금액은 10~500,000 사이로 조정해 주세요.');
@@ -287,33 +423,41 @@ function resolveDice() {
     return;
   }
 
-  let payout = 0;
-  let outcome = 'lose';
-  let message = `주사위 ${roll} / ${guess}번 선택`;
+  const roll = Math.floor(Math.random() * 6) + 1;
+  playBtnEl.disabled = true;
+  playBtnEl.textContent = '주사위 굴리는 중...';
 
-  if (guess === roll) {
-    payout = Math.floor(bet * gameConfig.dice.multiplier);
-    state.balance = state.balance - bet + payout;
-    outcome = 'win';
-    state.wins += 1;
-    message = `승리 · ${roll} / +${formatMoney(payout)}`;
-  } else {
-    state.balance -= bet;
-    message = `패배 · ${roll} / -${formatMoney(bet)}`;
-  }
+  animateDiceRoll(roll, () => {
+    let payout = 0;
+    let outcome = 'lose';
+    let message = `주사위 ${roll} / ${guess}번 선택`;
 
-  state.rounds += 1;
+    if (guess === roll) {
+      payout = Math.floor(bet * gameConfig.dice.multiplier);
+      state.balance = state.balance - bet + payout;
+      outcome = 'win';
+      state.wins += 1;
+      message = `승리 · ${roll} / +${formatMoney(payout)}`;
+    } else {
+      state.balance -= bet;
+      message = `패배 · ${roll} / -${formatMoney(bet)}`;
+    }
 
-  addHistory({
-    game: gameConfig.dice.title,
-    summary: `배팅 ${formatMoney(bet)}`,
-    result: message,
-    outcome,
+    state.rounds += 1;
+
+    addHistory({
+      game: gameConfig.dice.title,
+      summary: `배팅 ${formatMoney(bet)}`,
+      result: message,
+      outcome,
+    });
+
+    saveState();
+    updateAll();
+    setResult(message);
+    playBtnEl.disabled = false;
+    playBtnEl.textContent = '게임 실행';
   });
-
-  saveState();
-  updateAll();
-  setResult(message);
 }
 
 function resolveRps() {
@@ -431,7 +575,7 @@ function resolveRoulette() {
 
 function resolveSlots() {
   const bet = Number(betInputEl.value) || 0;
-  const symbols = ['7', '🍒', '⭐', '💎'];
+  const symbols = ['7', '🍒', '⭐', '💎', 'BAR', '777'];
   const roll = Array.from({ length: 3 }, () => symbols[Math.floor(Math.random() * symbols.length)]);
 
   if (bet < 10 || bet > 500000) {
@@ -444,38 +588,43 @@ function resolveSlots() {
     return;
   }
 
-  const win = roll.every((v) => v === roll[0]);
-  let payout = 0;
+  playBtnEl.disabled = true;
+  playBtnEl.textContent = '릴 돌리는 중...';
 
-  if (win) {
-    payout = Math.floor(bet * gameConfig.slots.multiplier);
-    state.balance = state.balance - bet + payout;
-    state.rounds += 1;
-    state.wins += 1;
-    addHistory({
-      game: gameConfig.slots.title,
-      summary: `배팅 ${formatMoney(bet)}`,
-      result: `승리 · ${roll.join(' ')} / +${formatMoney(payout)}`,
-      outcome: 'win',
-    });
+  animateSlotsSpin(roll, () => {
+    const win = roll.every((v) => v === roll[0]);
+    let payout = 0;
+    let resultText = `패배 · ${roll.join(' ')} / -${formatMoney(bet)}`;
+
+    if (win) {
+      payout = Math.floor(bet * gameConfig.slots.multiplier);
+      state.balance = state.balance - bet + payout;
+      state.rounds += 1;
+      state.wins += 1;
+      resultText = `승리 · ${roll.join(' ')} / +${formatMoney(payout)}`;
+      addHistory({
+        game: gameConfig.slots.title,
+        summary: `배팅 ${formatMoney(bet)}`,
+        result: resultText,
+        outcome: 'win',
+      });
+    } else {
+      state.balance -= bet;
+      state.rounds += 1;
+      addHistory({
+        game: gameConfig.slots.title,
+        summary: `배팅 ${formatMoney(bet)}`,
+        result: resultText,
+        outcome: 'lose',
+      });
+    }
+
     saveState();
     updateAll();
-    setResult(`승리 · ${roll.join(' ')} / +${formatMoney(payout)}`);
-    return;
-  }
-
-  state.balance -= bet;
-  state.rounds += 1;
-  addHistory({
-    game: gameConfig.slots.title,
-    summary: `배팅 ${formatMoney(bet)}`,
-    result: `패배 · ${roll.join(' ')} / -${formatMoney(bet)}`,
-    outcome: 'lose',
+    setResult(resultText);
+    playBtnEl.disabled = false;
+    playBtnEl.textContent = '게임 실행';
   });
-
-  saveState();
-  updateAll();
-  setResult(`패배 · ${roll.join(' ')} / -${formatMoney(bet)}`);
 }
 
 function resolveJackpot() {
@@ -490,38 +639,47 @@ function resolveJackpot() {
     return;
   }
 
-  const jackpotChance = Math.random();
-  let payout = 0;
+  const wheelSymbols = ['7', 'BAR', '★', '777', '7', 'CHERRY', 'BAR', '7'];
+  const finalIndex = Math.floor(Math.random() * wheelSymbols.length);
+  const finalSymbol = wheelSymbols[finalIndex];
+  const isWinner = finalSymbol.includes('7') || finalSymbol === '777';
 
-  if (jackpotChance < 0.08) {
-    payout = Math.floor(bet * gameConfig.jackpot.multiplier);
-    state.balance = state.balance - bet + payout;
-    state.rounds += 1;
-    state.wins += 1;
-    addHistory({
-      game: gameConfig.jackpot.title,
-      summary: `배팅 ${formatMoney(bet)}`,
-      result: `잭팟! +${formatMoney(payout)}`,
-      outcome: 'win',
-    });
+  playBtnEl.disabled = true;
+  playBtnEl.textContent = '룰렛 돌리는 중...';
+
+  animateJackpotSpin(finalIndex, () => {
+    let payout = 0;
+    let resultText = `패배 · ${finalSymbol} / -${formatMoney(bet)}`;
+
+    if (isWinner) {
+      payout = Math.floor(bet * gameConfig.jackpot.multiplier);
+      state.balance = state.balance - bet + payout;
+      state.rounds += 1;
+      state.wins += 1;
+      resultText = `잭팟! ${finalSymbol} / +${formatMoney(payout)}`;
+      addHistory({
+        game: gameConfig.jackpot.title,
+        summary: `배팅 ${formatMoney(bet)}`,
+        result: resultText,
+        outcome: 'win',
+      });
+    } else {
+      state.balance -= bet;
+      state.rounds += 1;
+      addHistory({
+        game: gameConfig.jackpot.title,
+        summary: `배팅 ${formatMoney(bet)}`,
+        result: resultText,
+        outcome: 'lose',
+      });
+    }
+
     saveState();
     updateAll();
-    setResult(`잭팟! +${formatMoney(payout)}`);
-    return;
-  }
-
-  state.balance -= bet;
-  state.rounds += 1;
-  addHistory({
-    game: gameConfig.jackpot.title,
-    summary: `배팅 ${formatMoney(bet)}`,
-    result: `패배 · -${formatMoney(bet)}`,
-    outcome: 'lose',
+    setResult(resultText);
+    playBtnEl.disabled = false;
+    playBtnEl.textContent = '게임 실행';
   });
-
-  saveState();
-  updateAll();
-  setResult(`패배 · -${formatMoney(bet)}`);
 }
 
 function handlePlay() {
@@ -600,5 +758,6 @@ playBtnEl.addEventListener('click', handlePlay);
 document.getElementById('daily-btn').addEventListener('click', handleDailyBonus);
 document.getElementById('reset-btn').addEventListener('click', resetBalance);
 
+setupSlotsScene();
 setActiveGame(state.activeGame);
 updateAll();
