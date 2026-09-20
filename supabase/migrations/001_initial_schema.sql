@@ -83,27 +83,35 @@ alter table public.inventory enable row level security;
 alter table public.swords enable row level security;
 alter table public.daily_claims enable row level security;
 
+drop policy if exists "profiles_self_select" on public.profiles;
 create policy "profiles_self_select" on public.profiles
 for select using (auth.uid() = id);
 
+drop policy if exists "ledger_self_select" on public.ledger;
 create policy "ledger_self_select" on public.ledger
 for select using (auth.uid() = user_id);
 
+drop policy if exists "rounds_self_select" on public.game_rounds;
 create policy "rounds_self_select" on public.game_rounds
 for select using (auth.uid() = user_id);
 
+drop policy if exists "items_read" on public.items;
 create policy "items_read" on public.items
 for select using (true);
 
+drop policy if exists "inventory_self_select" on public.inventory;
 create policy "inventory_self_select" on public.inventory
 for select using (auth.uid() = user_id);
 
+drop policy if exists "swords_self_select" on public.swords;
 create policy "swords_self_select" on public.swords
 for select using (auth.uid() = user_id);
 
+drop policy if exists "daily_claims_self_select" on public.daily_claims;
 create policy "daily_claims_self_select" on public.daily_claims
 for select using (auth.uid() = user_id);
 
+drop policy if exists "game_config_read" on public.game_config;
 create policy "game_config_read" on public.game_config
 for select using (true);
 

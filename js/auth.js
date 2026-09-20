@@ -9,7 +9,10 @@ const submitBtn = document.querySelector('.auth-submit');
 const supabaseStatusEl = document.getElementById('supabase-status');
 const supabaseDetailEl = document.getElementById('supabase-detail');
 
-let authMode = 'login';
+if (!authForm || !emailInput || !passwordInput || !authStatusEl || !submitBtn) {
+  console.warn('Auth page elements are missing; auth script skipped.');
+} else {
+  let authMode = 'login';
 
 function updateSupabaseStatus() {
   const config = window.appConfig?.supabase || {};
@@ -101,11 +104,12 @@ async function handleAuthSubmit(event) {
   }
 }
 
-authTabs.forEach((tab) => {
-  tab.addEventListener('click', () => setMode(tab.dataset.mode));
-});
+  authTabs.forEach((tab) => {
+    tab.addEventListener('click', () => setMode(tab.dataset.mode));
+  });
 
-authForm.addEventListener('submit', handleAuthSubmit);
+  authForm.addEventListener('submit', handleAuthSubmit);
 
-updateSupabaseStatus();
-setMode('login');
+  updateSupabaseStatus();
+  setMode('login');
+}

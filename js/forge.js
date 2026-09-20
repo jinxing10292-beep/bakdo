@@ -9,8 +9,11 @@ const sellBtnEl = document.getElementById('sell-btn');
 const protectToggle = document.getElementById('protect-toggle');
 const boostToggle = document.getElementById('boost-toggle');
 
-let swordLevel = 0;
-let swordName = '나무 검';
+if (!walletBalanceEl || !swordNameEl || !swordLevelEl || !successRateEl || !upgradeCostEl || !forgeStatusEl || !upgradeBtnEl || !sellBtnEl) {
+  console.warn('Forge page elements are missing; forge script skipped.');
+} else {
+  let swordLevel = 0;
+  let swordName = '나무 검';
 
 const swordNames = [
   '나무 검', '철 검', '강철 검', '용검', '전설 검',
@@ -122,6 +125,7 @@ function handleSell() {
   renderSwords();
 }
 
-upgradeBtnEl.addEventListener('click', handleUpgrade);
-sellBtnEl.addEventListener('click', handleSell);
-renderSwords();
+  upgradeBtnEl.addEventListener('click', handleUpgrade);
+  sellBtnEl.addEventListener('click', handleSell);
+  renderSwords();
+}

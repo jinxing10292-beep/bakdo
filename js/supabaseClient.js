@@ -1,10 +1,12 @@
 const { supabase: supabaseConfig } = window.appConfig || {};
 
-window.supabase = null;
+window.supabase = window.supabase || (typeof supabase !== 'undefined' ? supabase : null);
 
 if (supabaseConfig && supabaseConfig.enabled && supabaseConfig.url && supabaseConfig.anonKey) {
-  if (typeof supabase !== 'undefined' && typeof supabase.createClient === 'function') {
-    window.supabase = supabase.createClient(supabaseConfig.url, supabaseConfig.anonKey, {
+  const SupabaseLib = window.supabase || (typeof supabase !== 'undefined' ? supabase : null);
+
+  if (SupabaseLib && typeof SupabaseLib.createClient === 'function') {
+    window.supabase = SupabaseLib.createClient(supabaseConfig.url, supabaseConfig.anonKey, {
       auth: {
         persistSession: true,
         autoRefreshToken: true,

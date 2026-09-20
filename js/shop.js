@@ -2,7 +2,10 @@ const inventoryListEl = document.getElementById('inventory-list');
 const walletBalanceEl = document.getElementById('wallet-balance');
 const shopItemsEl = document.getElementById('shop-items');
 
-const shopItems = [
+if (!inventoryListEl || !walletBalanceEl || !shopItemsEl) {
+  console.warn('Shop page elements are missing; shop script skipped.');
+} else {
+  const shopItems = [
   { id: 'protect', name: '보호권', price: 2000, desc: '강화 실패 시 1회 보호', type: 'item' },
   { id: 'boost', name: '강화 주문서', price: 1500, desc: '강화 성공률 +5%p', type: 'item' },
   { id: 'starter-sword', name: '나무 검', price: 500, desc: '기본 장비', type: 'sword' },
@@ -83,6 +86,7 @@ function renderInventory() {
   });
 }
 
-renderWallet();
-renderShop();
-renderInventory();
+  renderWallet();
+  renderShop();
+  renderInventory();
+}
