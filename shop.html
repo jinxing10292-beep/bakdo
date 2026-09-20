@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>상점 · BAKDO</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="topbar page-header">
+        <div class="brand-wrap">
+          <div class="brand-mark">◆</div>
+          <div>
+            <p class="brand-tag">VIRTUAL CASINO</p>
+            <h1>BAKDO</h1>
+          </div>
+        </div>
+
+        <nav class="page-links" aria-label="페이지 이동">
+          <a href="index.html" class="secondary-btn">로비</a>
+          <a href="shop.html" class="secondary-btn active-link">상점</a>
+          <a href="forge.html" class="secondary-btn">검 강화</a>
+          <a href="login.html" class="secondary-btn">로그인</a>
+        </nav>
+      </header>
+
+      <main class="page-content shop-page">
+        <section class="panel-block shop-panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">SHOP</p>
+              <h2>상점</h2>
+            </div>
+            <div class="wallet-panel compact">
+              <span>보유 게임 머니</span>
+              <strong id="wallet-balance">0</strong>
+            </div>
+          </div>
+
+          <div id="shop-items" class="shop-grid" aria-live="polite"></div>
+        </section>
+
+        <aside class="panel-block inventory-panel">
+          <div class="panel-header">
+            <h3>인벤토리</h3>
+          </div>
+          <ul id="inventory-list" class="inventory-list"></ul>
+        </aside>
+      </main>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/supabaseClient.js"></script>
+    <script src="js/shop.js"></script>
+  </body>
+</html>

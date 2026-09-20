@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>검 강화 · BAKDO</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="topbar page-header">
+        <div class="brand-wrap">
+          <div class="brand-mark">◆</div>
+          <div>
+            <p class="brand-tag">VIRTUAL CASINO</p>
+            <h1>BAKDO</h1>
+          </div>
+        </div>
+
+        <nav class="page-links" aria-label="페이지 이동">
+          <a href="index.html" class="secondary-btn">로비</a>
+          <a href="shop.html" class="secondary-btn">상점</a>
+          <a href="forge.html" class="secondary-btn active-link">검 강화</a>
+          <a href="login.html" class="secondary-btn">로그인</a>
+        </nav>
+      </header>
+
+      <main class="page-content forge-page">
+        <section class="panel-block forge-panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">FORGE</p>
+              <h2>검 강화</h2>
+            </div>
+            <div class="wallet-panel compact">
+              <span>게임 머니</span>
+              <strong id="wallet-balance">0</strong>
+            </div>
+          </div>
+
+          <div class="forge-hero">
+            <div class="sword-visual" aria-label="강화 검">⚔</div>
+            <div class="sword-info">
+              <p class="sword-kicker">현재 장비</p>
+              <h3 id="sword-name">나무 검</h3>
+              <div class="sword-meta">
+                <span>등급: <strong id="sword-level">+0</strong></span>
+                <span>성공률: <strong id="success-rate">95%</strong></span>
+              </div>
+            </div>
+          </div>
+
+          <div class="forge-controls">
+            <label class="checkbox-row">
+              <input id="protect-toggle" type="checkbox" />
+              <span>보호권 사용</span>
+            </label>
+
+            <label class="checkbox-row">
+              <input id="boost-toggle" type="checkbox" />
+              <span>강화 주문서 사용</span>
+            </label>
+          </div>
+
+          <div class="upgrade-box">
+            <div>
+              <span class="muted-label">강화 비용</span>
+              <strong id="upgrade-cost">100</strong>
+            </div>
+            <button id="upgrade-btn" class="primary-btn">강화 실행</button>
+          </div>
+
+          <p id="forge-status" class="forge-status">검을 강화해 보세요.</p>
+        </section>
+
+        <aside class="panel-block guide-panel">
+          <h3>강화 가이드</h3>
+          <ul>
+            <li>+0 → +5: 95% 성공, 실패 시 단계 유지</li>
+            <li>+5 → +10: 70% 성공, 실패 시 1단계 하락</li>
+            <li>+10 → +15: 45% 성공, 파괴 확률 5%</li>
+            <li>+15 → +20: 20% 성공, 파괴 확률 15%</li>
+          </ul>
+        </aside>
+      </main>
+    </div>
+
+    <script src="js/config.js"></script>
+    <script src="js/supabaseClient.js"></script>
+    <script src="js/forge.js"></script>
+  </body>
+</html>

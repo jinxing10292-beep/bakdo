@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>BAKDO Casino</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <div class="brand-wrap">
+          <div class="brand-mark">◆</div>
+          <div>
+            <p class="brand-tag">VIRTUAL CASINO</p>
+            <h1>BAKDO</h1>
+          </div>
+        </div>
+
+        <div class="topbar-actions">
+          <div class="wallet-panel">
+            <span>게임 머니</span>
+            <strong id="wallet-balance">10,000</strong>
+          </div>
+          <nav class="page-links compact-links" aria-label="빠른 이동">
+            <a href="shop.html" class="secondary-btn">상점</a>
+            <a href="forge.html" class="secondary-btn">검 강화</a>
+            <a href="login.html" class="secondary-btn">로그인</a>
+          </nav>
+          <button id="daily-btn" class="secondary-btn">+ 5,000 보너스</button>
+        </div>
+      </header>
+
+      <div class="main-layout">
+        <aside class="sidebar">
+          <nav class="game-nav" aria-label="게임 선택">
+            <button class="nav-btn active" data-game="coinflip">코인플립</button>
+            <button class="nav-btn" data-game="dice">다이스</button>
+            <button class="nav-btn" data-game="rps">가위바위보</button>
+            <button class="nav-btn" data-game="forge">검 강화</button>
+          </nav>
+
+          <div class="mini-panel">
+            <h2>리더보드</h2>
+            <ul id="leaderboard" class="leaderboard-list">
+              <li><span>1. 루나</span><strong>14,500</strong></li>
+              <li><span>2. 카이</span><strong>12,980</strong></li>
+              <li><span>3. 모리</span><strong>11,760</strong></li>
+            </ul>
+          </div>
+        </aside>
+
+        <main class="content-area">
+          <section class="hero-panel">
+            <div>
+              <p class="eyebrow">가상 화폐 전용 카지노</p>
+              <h2 id="game-title">코인플립</h2>
+              <p class="subtitle">현실 돈은 사용하지 않고, 게임머니만으로 도박장을 즐기세요.</p>
+            </div>
+
+            <div class="stats-grid">
+              <div class="stat-card">
+                <span>총 판수</span>
+                <strong id="stats-rounds">0</strong>
+              </div>
+              <div class="stat-card">
+                <span>승률</span>
+                <strong id="stats-winrate">0%</strong>
+              </div>
+            </div>
+          </section>
+
+          <section class="game-panel">
+            <div class="bet-box">
+              <label for="bet-input">배팅 금액</label>
+              <div class="bet-row">
+                <input id="bet-input" type="number" min="10" max="500000" step="10" value="100" />
+                <button class="chip-btn" data-chip="100">100</button>
+                <button class="chip-btn" data-chip="500">500</button>
+                <button class="chip-btn" data-chip="1000">1,000</button>
+              </div>
+            </div>
+
+            <div class="choice-box">
+              <span class="choice-label">선택</span>
+              <div id="choice-buttons" class="choice-buttons" aria-live="polite"></div>
+            </div>
+
+            <div class="result-box">
+              <p class="result-label">결과</p>
+              <div id="result-value" class="result-value">결과를 기다리는 중...</div>
+              <button id="play-btn" class="primary-btn">게임 실행</button>
+            </div>
+          </section>
+
+          <section class="history-panel">
+            <div class="panel-header">
+              <h3>최근 결과</h3>
+              <button id="reset-btn" class="ghost-btn">잔액 초기화</button>
+            </div>
+            <ul id="history-list" class="history-list"></ul>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <script src="js/app.js"></script>
+  </body>
+</html>

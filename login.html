@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>로그인 · BAKDO</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body class="auth-page">
+    <div class="auth-shell">
+      <div class="auth-card">
+        <div class="brand-wrap">
+          <div class="brand-mark">◆</div>
+          <div>
+            <p class="brand-tag">VIRTUAL CASINO</p>
+            <h1>BAKDO</h1>
+          </div>
+        </div>
+
+        <div class="auth-tabs" aria-label="로그인 방식 선택">
+          <button class="auth-tab active" data-mode="login" type="button">로그인</button>
+          <button class="auth-tab" data-mode="signup" type="button">회원가입</button>
+        </div>
+
+        <form id="auth-form" class="auth-form">
+          <div id="nickname-group" class="field-group hidden">
+            <label for="nickname-input">닉네임</label>
+            <input id="nickname-input" type="text" maxlength="20" placeholder="플레이어 이름" />
+          </div>
+
+          <div class="field-group">
+            <label for="email-input">이메일</label>
+            <input id="email-input" type="email" placeholder="player@example.com" required />
+          </div>
+
+          <div class="field-group">
+            <label for="password-input">비밀번호</label>
+            <input id="password-input" type="password" placeholder="••••••••" required />
+          </div>
+
+          <button class="primary-btn auth-submit" type="submit">로그인</button>
+        </form>
+
+        <p id="auth-status" class="auth-status">Supabase 연결 여부를 확인하는 중입니다.</p>
+
+        <a href="index.html" class="text-link">메인 로비로 돌아가기</a>
+      </div>
+
+      <aside class="auth-side">
+        <div class="mini-panel">
+          <h2>게임머니 시스템</h2>
+          <ul>
+            <li>가상 화폐만 사용</li>
+            <li>실제 충전/환전 없음</li>
+            <li>로그인 후 지갑과 기록 보관</li>
+          </ul>
+        </div>
+
+        <div class="mini-panel status-panel">
+          <h2>연결 상태</h2>
+          <div id="supabase-status" class="status-pill offline">설정 대기 중</div>
+          <p id="supabase-detail">Supabase URL과 anon key를 설정하면 로그인 기능이 활성화됩니다.</p>
+        </div>
+      </aside>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js"></script>
+    <script src="js/supabaseClient.js"></script>
+    <script src="js/auth.js"></script>
+  </body>
+</html>
