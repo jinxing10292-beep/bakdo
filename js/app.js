@@ -42,11 +42,38 @@ const gameConfig = {
     multiplier: 1.94,
     description: '컴퓨터와 대결해 승리하면 배당을 받습니다.',
   },
+  roulette: {
+    title: '룰렛',
+    choices: [
+      { value: 'red', label: '빨강' },
+      { value: 'black', label: '검정' },
+      { value: 'even', label: '짝수' },
+      { value: 'odd', label: '홀수' },
+    ],
+    multiplier: 1.95,
+    description: '색상과 홀짝으로 베팅해 룰렛 결과를 맞춥니다.',
+  },
+  slots: {
+    title: '슬롯',
+    choices: [
+      { value: 'spin', label: '회전' },
+    ],
+    multiplier: 10,
+    description: '3개 심볼이 맞으면 상금을 획득합니다.',
+  },
+  jackpot: {
+    title: '잭팟',
+    choices: [
+      { value: 'jackpot', label: '잭팟' },
+    ],
+    multiplier: 50,
+    description: '짜릿한 대박 기회를 준비했습니다.',
+  },
   forge: {
     title: '검 강화',
     choices: [],
     multiplier: 0,
-    description: '다음 단계에서 실제 강화 시스템을 추가할 예정입니다.',
+    description: '검을 강화하고 판매까지 진행할 수 있습니다.',
   },
 };
 
@@ -352,6 +379,151 @@ function resolveRps() {
   setResult(message);
 }
 
+function resolveRoulette() {
+  const bet = Number(betInputEl.value) || 0;
+  const color = ['red', 'black'];
+  const result = color[Math.floor(Math.random() * color.length)];
+  const guess = String(state.selectedChoice);
+
+  if (bet < 10 || bet > 500000) {
+    setResult('배팅 금액은 10~500,000 사이로 조정해 주세요.');
+    return;
+  }
+
+  if (state.balance < bet) {
+    setResult('게임 머니가 부족합니다.');
+    return;
+  }
+
+  const isWin = guess === result || (guess === 'even' && Math.random() < 0.5) || (guess === 'odd' && Math.random() >= 0.5);
+  let payout = 0;
+
+  if (isWin) {
+    payout = Math.floor(bet * gameConfig.roulette.multiplier);
+    state.balance = state.balance - bet + payout;
+    state.rounds += 1;
+    state.wins += 1;
+    addHistory({
+      game: gameConfig.roulette.title,
+      summary: `배팅 ${formatMoney(bet)}`,
+      result: `승리 · ${result} / +${formatMoney(payout)}`,
+      outcome: 'win',
+    });
+    saveState();
+    updateAll();
+    setResult(`승리 · ${result} / +${formatMoney(payout)}`);
+    return;
+  }
+
+  state.balance -= bet;
+  state.rounds += 1;
+  addHistory({
+    game: gameConfig.roulette.title,
+    summary: `배팅 ${formatMoney(bet)}`,
+    result: `패배 · ${result} / -${formatMoney(bet)}`,
+    outcome: 'lose',
+  });
+
+  saveState();
+  updateAll();
+  setResult(`패배 · ${result} / -${formatMoney(bet)}`);
+}
+
+function resolveSlots() {
+  const bet = Number(betInputEl.value) || 0;
+  const symbols = ['7', '🍒', '⭐', '💎'];
+  const roll = Array.from({ length: 3 }, () => symbols[Math.floor(Math.random() * symbols.length)]);
+
+  if (bet < 10 || bet > 500000) {
+    setResult('배팅 금액은 10~500,000 사이로 조정해 주세요.');
+    return;
+  }
+
+  if (state.balance < bet) {
+    setResult('게임 머니가 부족합니다.');
+    return;
+  }
+
+  const win = roll.every((v) => v === roll[0]);
+  let payout = 0;
+
+  if (win) {
+    payout = Math.floor(bet * gameConfig.slots.multiplier);
+    state.balance = state.balance - bet + payout;
+    state.rounds += 1;
+    state.wins += 1;
+    addHistory({
+      game: gameConfig.slots.title,
+      summary: `배팅 ${formatMoney(bet)}`,
+      result: `승리 · ${roll.join(' ')} / +${formatMoney(payout)}`,
+      outcome: 'win',
+    });
+    saveState();
+    updateAll();
+    setResult(`승리 · ${roll.join(' ')} / +${formatMoney(payout)}`);
+    return;
+  }
+
+  state.balance -= bet;
+  state.rounds += 1;
+  addHistory({
+    game: gameConfig.slots.title,
+    summary: `배팅 ${formatMoney(bet)}`,
+    result: `패배 · ${roll.join(' ')} / -${formatMoney(bet)}`,
+    outcome: 'lose',
+  });
+
+  saveState();
+  updateAll();
+  setResult(`패배 · ${roll.join(' ')} / -${formatMoney(bet)}`);
+}
+
+function resolveJackpot() {
+  const bet = Number(betInputEl.value) || 0;
+  if (bet < 10 || bet > 500000) {
+    setResult('배팅 금액은 10~500,000 사이로 조정해 주세요.');
+    return;
+  }
+
+  if (state.balance < bet) {
+    setResult('게임 머니가 부족합니다.');
+    return;
+  }
+
+  const jackpotChance = Math.random();
+  let payout = 0;
+
+  if (jackpotChance < 0.08) {
+    payout = Math.floor(bet * gameConfig.jackpot.multiplier);
+    state.balance = state.balance - bet + payout;
+    state.rounds += 1;
+    state.wins += 1;
+    addHistory({
+      game: gameConfig.jackpot.title,
+      summary: `배팅 ${formatMoney(bet)}`,
+      result: `잭팟! +${formatMoney(payout)}`,
+      outcome: 'win',
+    });
+    saveState();
+    updateAll();
+    setResult(`잭팟! +${formatMoney(payout)}`);
+    return;
+  }
+
+  state.balance -= bet;
+  state.rounds += 1;
+  addHistory({
+    game: gameConfig.jackpot.title,
+    summary: `배팅 ${formatMoney(bet)}`,
+    result: `패배 · -${formatMoney(bet)}`,
+    outcome: 'lose',
+  });
+
+  saveState();
+  updateAll();
+  setResult(`패배 · -${formatMoney(bet)}`);
+}
+
 function handlePlay() {
   if (state.activeGame === 'coinflip') {
     resolveCoinFlip();
@@ -368,12 +540,36 @@ function handlePlay() {
     return;
   }
 
-  setResult('검 강화는 다음 Phase에서 구현할 예정입니다.');
+  if (state.activeGame === 'roulette') {
+    resolveRoulette();
+    return;
+  }
+
+  if (state.activeGame === 'slots') {
+    resolveSlots();
+    return;
+  }
+
+  if (state.activeGame === 'jackpot') {
+    resolveJackpot();
+    return;
+  }
+
+  setResult('검 강화는 검 강화 페이지에서 진행하세요.');
 }
 
 function handleDailyBonus() {
+  const todayKey = new Date().toISOString().slice(0, 10);
+  const lastClaim = localStorage.getItem('bakdo-daily-claim');
+
+  if (lastClaim === todayKey) {
+    setResult('오늘은 이미 5,000 코인을 받았습니다.');
+    return;
+  }
+
   state.balance += 5000;
-  setResult('일일 보너스 5,000 게임 머니를 받았습니다.');
+  localStorage.setItem('bakdo-daily-claim', todayKey);
+  setResult('일일 보너스 5,000 코인을 받았습니다.');
   saveState();
   updateAll();
 }

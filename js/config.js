@@ -3,9 +3,9 @@ window.appConfig = {
   currencyName: '게임 머니',
   dailyBonus: 5000,
   supabase: {
-    url: 'https://YOUR_PROJECT_URL.supabase.co',
-    anonKey: 'YOUR_ANON_KEY',
-    enabled: false,
+    url: 'https://ihyfvpmlehpopwbfvcoi.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImloeWZ2cG1sZWhwb3B3YmZ2Y29pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk4OTQ0MTUsImV4cCI6MjEwNTQ3MDQxNX0.NCSkORMLPAspgrL6hkGvoqrEf_fHfAAC8969OMUfya8',
+    enabled: true,
   },
 };
 

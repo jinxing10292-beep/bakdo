@@ -5,6 +5,7 @@ const successRateEl = document.getElementById('success-rate');
 const upgradeCostEl = document.getElementById('upgrade-cost');
 const forgeStatusEl = document.getElementById('forge-status');
 const upgradeBtnEl = document.getElementById('upgrade-btn');
+const sellBtnEl = document.getElementById('sell-btn');
 const protectToggle = document.getElementById('protect-toggle');
 const boostToggle = document.getElementById('boost-toggle');
 
@@ -110,5 +111,17 @@ function handleUpgrade() {
   }
 }
 
+function handleSell() {
+  const currentBalance = getBalance();
+  const sellPrice = 120 + swordLevel * 220;
+  const nextBalance = currentBalance + sellPrice;
+
+  setBalance(nextBalance);
+  forgeStatusEl.textContent = `검을 판매해 ${formatMoney(sellPrice)} 코인을 받았습니다.`;
+  swordLevel = 0;
+  renderSwords();
+}
+
 upgradeBtnEl.addEventListener('click', handleUpgrade);
+sellBtnEl.addEventListener('click', handleSell);
 renderSwords();
