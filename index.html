@@ -40,6 +40,7 @@
             <button class="nav-btn" data-game="roulette">룰렛</button>
             <button class="nav-btn" data-game="slots">슬롯</button>
             <button class="nav-btn" data-game="jackpot">잭팟</button>
+            <button class="nav-btn" data-game="lottery">복권</button>
             <button class="nav-btn" data-game="forge">검 강화</button>
           </nav>
 
@@ -120,6 +121,12 @@
 
             <div id="slots-scene" class="slots-scene hidden" aria-live="polite">
               <div id="slots-reels" class="slots-reels"></div>
+            </div>
+
+            <div id="lottery-scene" class="lottery-scene hidden" aria-live="polite">
+              <div class="lottery-card">
+                <canvas id="lottery-canvas" width="360" height="220" aria-label="복권 긁기 카드"></canvas>
+              </div>
             </div>
           </section>
 

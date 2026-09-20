@@ -69,11 +69,48 @@ const gameConfig = {
     multiplier: 50,
     description: '짜릿한 대박 기회를 준비했습니다.',
   },
+  lottery: {
+    title: '복권',
+    choices: [
+      { value: 'bronze', label: '브론즈 100' },
+      { value: 'silver', label: '실버 1,000' },
+      { value: 'cat', label: '고양이 10,000' },
+    ],
+    multiplier: 1,
+    description: '캔버스를 긁어 복권 결과를 확인하세요.',
+  },
   forge: {
     title: '검 강화',
     choices: [],
     multiplier: 0,
     description: '검을 강화하고 판매까지 진행할 수 있습니다.',
+  },
+};
+
+const lotteryTicketConfig = {
+  bronze: {
+    type: 'bronze',
+    label: '브론즈 복권',
+    price: 100,
+    holes: 3,
+    radius: 28,
+    emoji: '🥉',
+  },
+  silver: {
+    type: 'silver',
+    label: '실버 복권',
+    price: 1000,
+    holes: 5,
+    radius: 26,
+    emoji: '🥈',
+  },
+  cat: {
+    type: 'cat',
+    label: '고양이 복권',
+    price: 10000,
+    holes: 5,
+    radius: 26,
+    emoji: '🐾',
   },
 };
 
@@ -96,6 +133,8 @@ const jackpotSceneEl = document.getElementById('jackpot-scene');
 const jackpotWheelEl = document.getElementById('jackpot-wheel');
 const slotsSceneEl = document.getElementById('slots-scene');
 const slotsReelsEl = document.getElementById('slots-reels');
+const lotterySceneEl = document.getElementById('lottery-scene');
+const lotteryCanvasEl = document.getElementById('lottery-canvas');
 const slotSymbols = ['7', '🍒', '⭐', '💎', 'BAR', '777'];
 
 const diceFaceMap = {
@@ -266,6 +305,14 @@ function setActiveGame(gameKey) {
     slotsSceneEl.classList.toggle('hidden', gameKey !== 'slots');
   }
 
+  if (lotterySceneEl) {
+    lotterySceneEl.classList.toggle('hidden', gameKey !== 'lottery');
+  }
+
+  if (gameKey === 'lottery') {
+    prepareLotteryBoard();
+  }
+
   updateGameTitle();
   renderChoiceButtons();
 }
@@ -349,6 +396,261 @@ function animateSlotsSpin(finalSymbols, callback) {
   });
 
   setTimeout(callback, 1900);
+}
+
+function getLotterySymbolsForType(type) {
+  const config = lotteryTicketConfig[type] || lotteryTicketConfig.bronze;
+  const symbols = ['6', '체리', '별', '7'];
+  const results = [];
+
+  for (let i = 0; i < config.holes; i += 1) {
+    const roll = Math.random();
+    let chosen = '체리';
+
+    if (roll < 0.15) {
+      chosen = '6';
+    } else if (roll < 0.85) {
+      chosen = '체리';
+    } else if (roll < 0.95) {
+      chosen = '별';
+    } else {
+      chosen = '7';
+    }
+
+    results.push(chosen);
+  }
+
+  return results;
+}
+
+function getLotteryHolePositions(type) {
+  const cfg = lotteryTicketConfig[type] || lotteryTicketConfig.bronze;
+
+  if (type === 'bronze') {
+    return [
+      { x: 86, y: 96, r: cfg.radius },
+      { x: 180, y: 96, r: cfg.radius },
+      { x: 274, y: 96, r: cfg.radius },
+    ];
+  }
+
+  if (type === 'silver') {
+    return [
+      { x: 68, y: 82, r: cfg.radius },
+      { x: 132, y: 82, r: cfg.radius },
+      { x: 196, y: 82, r: cfg.radius },
+      { x: 260, y: 82, r: cfg.radius },
+      { x: 324, y: 82, r: cfg.radius },
+    ];
+  }
+
+  return [
+    { x: 112, y: 116, r: 24 },
+    { x: 196, y: 78, r: 20 },
+    { x: 280, y: 116, r: 24 },
+    { x: 196, y: 168, r: 20 },
+    { x: 196, y: 116, r: 38 },
+  ];
+}
+
+function prepareLotteryBoard() {
+  if (!lotteryCanvasEl) {
+    return;
+  }
+
+  const type = state.selectedChoice || 'bronze';
+  const config = lotteryTicketConfig[type] || lotteryTicketConfig.bronze;
+  const canvas = lotteryCanvasEl;
+  const ctx = canvas.getContext('2d');
+  const positions = getLotteryHolePositions(type);
+  const symbols = getLotterySymbolsForType(type);
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+  gradient.addColorStop(0, '#f4d58d');
+  gradient.addColorStop(0.25, '#eaaf3d');
+  gradient.addColorStop(0.7, '#efc86d');
+  gradient.addColorStop(1, '#bf8930');
+
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  ctx.fillStyle = 'rgba(18, 25, 42, 0.9)';
+  ctx.fillRect(18, 16, canvas.width - 36, canvas.height - 32);
+
+  ctx.fillStyle = '#f4d58d';
+  ctx.font = 'bold 18px sans-serif';
+  ctx.fillText(`${config.label} · ${config.price} 코인`, 32, 42);
+
+  positions.forEach((hole, index) => {
+    ctx.beginPath();
+    ctx.arc(hole.x, hole.y, hole.r, 0, Math.PI * 2);
+    ctx.fillStyle = '#e8eefc';
+    ctx.fill();
+    ctx.closePath();
+
+    ctx.beginPath();
+    ctx.arc(hole.x, hole.y, hole.r - 8, 0, Math.PI * 2);
+    ctx.fillStyle = '#dfe7ff';
+    ctx.fill();
+    ctx.closePath();
+
+    ctx.fillStyle = '#111827';
+    ctx.font = 'bold 26px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(symbols[index], hole.x, hole.y + 2);
+  });
+
+  ctx.fillStyle = 'rgba(15, 20, 30, 0.72)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  const cardState = {
+    type,
+    cells: positions.map((pos, index) => ({ ...pos, symbol: symbols[index] })),
+    scratched: 0,
+    resolved: false,
+  };
+
+  canvas._lotteryState = cardState;
+  canvas._lotteryIsScratching = false;
+
+  canvas.onmousedown = (event) => {
+    const point = getCanvasPoint(event, canvas);
+    canvas._lotteryIsScratching = true;
+    scratchLotteryAtPoint(point.x, point.y, canvas);
+  };
+
+  canvas.onmousemove = (event) => {
+    if (!canvas._lotteryIsScratching || canvas._lotteryState.resolved) return;
+    const point = getCanvasPoint(event, canvas);
+    scratchLotteryAtPoint(point.x, point.y, canvas);
+  };
+
+  canvas.onmouseup = () => {
+    canvas._lotteryIsScratching = false;
+    finishLotteryIfNeeded(canvas);
+  };
+
+  canvas.onmouseleave = () => {
+    canvas._lotteryIsScratching = false;
+    finishLotteryIfNeeded(canvas);
+  };
+}
+
+function getCanvasPoint(event, canvas) {
+  const rect = canvas.getBoundingClientRect();
+  const scaleX = canvas.width / rect.width;
+  const scaleY = canvas.height / rect.height;
+  return {
+    x: (event.clientX - rect.left) * scaleX,
+    y: (event.clientY - rect.top) * scaleY,
+  };
+}
+
+function scratchLotteryAtPoint(x, y, canvas) {
+  const ctx = canvas.getContext('2d');
+  ctx.save();
+  ctx.globalCompositeOperation = 'destination-out';
+  ctx.beginPath();
+  ctx.arc(x, y, 18, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.closePath();
+  ctx.restore();
+
+  const image = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  const pixels = image.data;
+  let cleared = 0;
+
+  for (let i = 0; i < pixels.length; i += 4) {
+    if (pixels[i + 3] === 0) {
+      cleared += 1;
+    }
+  }
+
+  const totalPixels = canvas.width * canvas.height;
+  const ratio = cleared / totalPixels;
+  canvas._lotteryState.scratched = ratio;
+}
+
+function finishLotteryIfNeeded(canvas) {
+  if (!canvas || !canvas._lotteryState || canvas._lotteryState.resolved) return;
+
+  if (canvas._lotteryState.scratched > 0.35) {
+    canvas._lotteryState.resolved = true;
+    resolveLotteryFromCanvas(canvas);
+  }
+}
+
+function resolveLotteryFromCanvas(canvas) {
+  const stateForTicket = canvas._lotteryState;
+  const ticketType = stateForTicket.type;
+  const ticketConfig = lotteryTicketConfig[ticketType] || lotteryTicketConfig.bronze;
+  const ticketValue = ticketConfig.price;
+  const symbolCounts = { '6': 0, '체리': 0, '별': 0, '7': 0 };
+
+  stateForTicket.cells.forEach((cell) => {
+    symbolCounts[cell.symbol] += 1;
+  });
+
+  let payout = 0;
+  payout -= symbolCounts['6'] * ticketValue * 2;
+  payout += Math.floor(symbolCounts['체리'] / 2) * ticketValue;
+  payout += symbolCounts['별'] * ticketValue * 3;
+  payout += symbolCounts['7'] * ticketValue * 300;
+
+  const resultText = payout > 0
+    ? `복권 결과: ${ticketConfig.label} / +${formatMoney(payout)}`
+    : `복권 결과: ${ticketConfig.label} / -${formatMoney(Math.abs(payout))}`;
+
+  if (payout > 0) {
+    state.balance = state.balance - ticketValue + payout;
+    state.rounds += 1;
+    state.wins += 1;
+    addHistory({
+      game: gameConfig.lottery.title,
+      summary: `${ticketConfig.label} ${formatMoney(ticketValue)}`,
+      result: resultText,
+      outcome: 'win',
+    });
+  } else {
+    state.balance -= ticketValue;
+    state.rounds += 1;
+    addHistory({
+      game: gameConfig.lottery.title,
+      summary: `${ticketConfig.label} ${formatMoney(ticketValue)}`,
+      result: resultText,
+      outcome: 'lose',
+    });
+  }
+
+  saveState();
+  updateAll();
+  setResult(resultText);
+  playBtnEl.disabled = false;
+  playBtnEl.textContent = '게임 실행';
+}
+
+function resolveLottery() {
+  const type = state.selectedChoice || 'bronze';
+  const config = lotteryTicketConfig[type] || lotteryTicketConfig.bronze;
+  const price = config.price;
+
+  if (state.balance < price) {
+    setResult('게임 머니가 부족합니다.');
+    return;
+  }
+
+  if (!lotteryCanvasEl) {
+    setResult('복권 캔버스를 불러오지 못했습니다.');
+    return;
+  }
+
+  prepareLotteryBoard();
+  setResult('캔버스를 긁어 결과를 확인하세요.');
+  playBtnEl.disabled = true;
+  playBtnEl.textContent = '복권 긁는 중...';
 }
 
 function addHistory({ game, summary, result, outcome }) {
@@ -710,6 +1012,11 @@ function handlePlay() {
 
   if (state.activeGame === 'jackpot') {
     resolveJackpot();
+    return;
+  }
+
+  if (state.activeGame === 'lottery') {
+    resolveLottery();
     return;
   }
 
